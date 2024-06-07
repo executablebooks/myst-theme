@@ -1,6 +1,6 @@
-import type { LinksFunction, MetaFunction, LoaderFunction, V2_MetaFunction } from '@remix-run/node';
-import tailwind from '~/styles/app.css';
-import thebeCoreCss from 'thebe-core/dist/lib/thebe-core.css';
+import type { LinksFunction, LoaderFunction, MetaFunction } from '@remix-run/node';
+import tailwind from '~/styles/app.css?url';
+import thebeCoreCss from 'thebe-core/dist/lib/thebe-core.css?url';
 import { getConfig } from '~/utils/loaders.server';
 import { type SiteLoader } from '@myst-theme/common';
 import {
@@ -10,11 +10,15 @@ import {
   getThemeSession,
   ContentReload,
   SkipToArticle,
+  AppErrorBoundary as ErrorBoundary,
 } from '@myst-theme/site';
-import { Outlet, useLoaderData } from '@remix-run/react';
-export { AppCatchBoundary as CatchBoundary } from '@myst-theme/site';
+import {
+  Outlet,
+  useLoaderData,
+} from '@remix-run/react';
 
-export const meta: V2_MetaFunction = ({ data }) => {
+
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return getMetaTagsForSite({
     title: data?.config?.title,
     description: data?.config?.description,
