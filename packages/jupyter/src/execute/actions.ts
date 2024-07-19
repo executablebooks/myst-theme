@@ -1,6 +1,11 @@
 import type { SourceFileKind, Dependency } from 'myst-spec-ext';
 import type { BuildStatus, Computable } from './types.js';
-import type { IRenderMimeRegistry, ThebeNotebook, ThebeSession } from 'thebe-core';
+import type {
+  IRenderMimeRegistry,
+  ThebeNotebook,
+  ThebePassiveManager,
+  ThebeSession,
+} from 'thebe-core';
 import type { GenericParent } from 'myst-common';
 
 export function isNavigatePayload(payload: unknown): payload is NavigatePayload {
@@ -90,7 +95,7 @@ interface AddNotebookPayload {
 }
 
 interface AddPassivePayload {
-  manager: any; //TODO ThebePassiveManager
+  manager: ThebePassiveManager;
   rendermime: IRenderMimeRegistry;
   pageSlug: string;
 }
