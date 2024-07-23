@@ -1,6 +1,11 @@
 import type { GenericParent } from 'myst-common';
 import type { SourceFileKind, Dependency } from 'myst-spec-ext';
-import type { IRenderMimeRegistry, ThebeNotebook, ThebeSession } from 'thebe-core';
+import type {
+  IRenderMimeRegistry,
+  ThebeNotebook,
+  ThebeSession,
+  ThebePassiveManager,
+} from 'thebe-core';
 
 export type BuildStatus =
   | 'pending'
@@ -32,6 +37,10 @@ export interface ExecuteScopeState {
       ready: boolean;
       scopes: {
         [notebookSlug: string]: ExecutionScope;
+      };
+      passive?: {
+        manager: ThebePassiveManager;
+        rendermime: IRenderMimeRegistry;
       };
     };
   };
