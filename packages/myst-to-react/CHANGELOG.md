@@ -1,5 +1,12 @@
 # myst-to-react
 
+## 0.9.11
+
+### Patch Changes
+
+- 7d8819d8: Add id to span/div nodes
+  - @myst-theme/providers@0.9.11
+
 ## 0.9.10
 
 ### Patch Changes
