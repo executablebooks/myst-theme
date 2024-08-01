@@ -86,7 +86,7 @@ function ArticlePageAndNavigationInternal({
   const { container, toc } = useTocHeight(top, inset);
   return (
     <>
-      <TopNav />
+      <TopNav hideToc={ hide_toc } />
       <Navigation
         tocRef={toc}
         hide_toc={hide_toc}
