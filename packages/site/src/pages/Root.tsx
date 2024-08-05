@@ -56,7 +56,7 @@ export function Document({
         NavLink: NavLink as any,
       };
   return (
-    <ThemeProvider theme={theme} renderers={renderers} {...links} top={top}>
+    <ThemeProvider theme={theme} renderers={renderers} staticBuild={staticBuild} {...links} top={top}>
       <DocumentWithoutProviders
         children={children}
         scripts={scripts}

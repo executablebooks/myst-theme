@@ -83,6 +83,8 @@ export function BlockingThemeLoader() {
   return <script dangerouslySetInnerHTML={{ __html: clientThemeSource }} />;
 }
 
+const THEME_KEY = 'myst:theme';
+
 export function ThemeProvider({
   children,
   theme: startingTheme,
@@ -90,6 +92,7 @@ export function ThemeProvider({
   Link,
   top,
   NavLink,
+  staticBuild,
 }: {
   children: React.ReactNode;
   theme?: Theme;
@@ -97,6 +100,7 @@ export function ThemeProvider({
   Link?: Link;
   top?: number;
   NavLink?: NavLink;
+  staticBuild?: boolean;
 }) {
   const [theme, setTheme] = React.useState<Theme | null>(() => {
     // Allow hard-coded theme ignoring system preferences (not recommended)
@@ -105,6 +109,14 @@ export function ThemeProvider({
     }
     if (typeof window !== 'object') {
       return null;
+    }
+
+    // Prefer local storage if set
+    if (staticBuild) {
+      const savedTheme = localStorage.get(THEME_KEY);
+      if (savedTheme) {
+        return savedTheme;
+      }
     }
 
     // Interrogate the sytstem for a preferred theme
@@ -133,10 +145,14 @@ export function ThemeProvider({
     if (!isTheme(theme)) {
       return;
     }
-    const xmlhttp = new XMLHttpRequest();
-    xmlhttp.open('POST', '/api/theme');
-    xmlhttp.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
-    xmlhttp.send(JSON.stringify({ theme }));
+    if (staticBuild) {
+      localStorage.setItem(THEME_KEY, JSON.stringify(theme));
+    } else {
+      const xmlhttp = new XMLHttpRequest();
+      xmlhttp.open('POST', '/api/theme');
+      xmlhttp.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+      xmlhttp.send(JSON.stringify({ theme }));
+    }
   }, [theme]);
 
   return (
