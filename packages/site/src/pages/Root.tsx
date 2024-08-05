@@ -56,7 +56,13 @@ export function Document({
         NavLink: NavLink as any,
       };
   return (
-    <ThemeProvider theme={theme} renderers={renderers} staticBuild={staticBuild} {...links} top={top}>
+    <ThemeProvider
+      theme={theme}
+      renderers={renderers}
+      staticBuild={staticBuild}
+      {...links}
+      top={top}
+    >
       <DocumentWithoutProviders
         children={children}
         scripts={scripts}
@@ -88,7 +94,7 @@ export function DocumentWithoutProviders({
   top?: number;
   renderers?: Record<string, NodeRenderer>;
 }) {
-  const {theme } = useTheme();
+  const { theme } = useTheme();
   return (
     <html lang="en" className={classNames(theme)} style={{ scrollPadding: top }}>
       <head>
