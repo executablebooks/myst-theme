@@ -56,17 +56,17 @@ type ThemeContextType = {
 const ThemeContext = React.createContext<ThemeContextType | undefined>(undefined);
 ThemeContext.displayName = 'ThemeContext';
 
-const prefersLightMQ = '(prefers-color-scheme: light)';
+const PREFERS_LIGHT_MQ = '(prefers-color-scheme: light)';
 
 /**
  * Return the theme preference indicated by the system
  */
 function getPreferredTheme() {
-  return window.matchMedia(prefersLightMQ).matches ? Theme.light : Theme.dark;
+  return window.matchMedia(PREFERS_LIGHT_MQ).matches ? Theme.light : Theme.dark;
 }
 
-const clientThemeSource = `
-  const theme = window.matchMedia(${JSON.stringify(prefersLightMQ)}).matches ? 'light' : 'dark';
+const CLIENT_THEME_SOURCE = `
+  const theme = window.matchMedia(${JSON.stringify(PREFERS_LIGHT_MQ)}).matches ? 'light' : 'dark';
   const classes = document.documentElement.classList;
   const hasAnyTheme = classes.contains('light') || classes.contains('dark');
   if (hasAnyTheme) {
@@ -80,7 +80,7 @@ const clientThemeSource = `
  * A blocking element that runs before hydration to update the <html> preferred class
  */
 export function BlockingThemeLoader() {
-  return <script dangerouslySetInnerHTML={{ __html: clientThemeSource }} />;
+  return <script dangerouslySetInnerHTML={{ __html: CLIENT_THEME_SOURCE }} />;
 }
 
 const THEME_KEY = 'myst:theme';
@@ -125,7 +125,7 @@ export function ThemeProvider({
 
   // Listen for system-updates that change the preferred theme
   useEffect(() => {
-    const mediaQuery = window.matchMedia(prefersLightMQ);
+    const mediaQuery = window.matchMedia(PREFERS_LIGHT_MQ);
     const handleChange = () => {
       setTheme(mediaQuery.matches ? Theme.light : Theme.dark);
     };
