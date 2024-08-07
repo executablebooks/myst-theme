@@ -1,5 +1,11 @@
 # @myst-theme/frontmatter
 
+## 0.9.11
+
+### Patch Changes
+
+- 2778ea6a: Add a tooltip for the Jupyter Notebook icon
+
 ## 0.9.10
 
 ## 0.9.9
