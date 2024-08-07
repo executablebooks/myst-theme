@@ -1,5 +1,21 @@
 # @myst-theme/site
 
+## 0.9.11
+
+### Patch Changes
+
+- 61e24ace: Hide TOC hamburger when TOC is hidden, remove unused option
+- cdddd32b: Improve navbar UX for small viewports
+- Updated dependencies [7d8819d8]
+- Updated dependencies [2778ea6a]
+  - myst-to-react@0.9.11
+  - @myst-theme/frontmatter@0.9.11
+  - @myst-theme/providers@0.9.11
+  - @myst-theme/diagrams@0.9.11
+  - @myst-theme/jupyter@0.9.11
+  - @myst-theme/common@0.9.11
+  - myst-demo@0.9.11
+
 ## 0.9.10
 
 ### Patch Changes
