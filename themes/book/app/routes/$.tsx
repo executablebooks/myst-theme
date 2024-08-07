@@ -8,7 +8,7 @@ import { getProject, isFlatSite, type PageLoader } from '@myst-theme/common';
 import {
   KatexCSS,
   useOutlineHeight,
-  useTocHeight,
+  useSidebarHeight,
   Navigation,
   TopNav,
   getMetaTagsForArticle,
@@ -83,12 +83,12 @@ export function ArticlePageAndNavigation({
   inset?: number;
 }) {
   const top = useThemeTop();
-  const { container, toc } = useTocHeight(top, inset);
+  const { container, toc } = useSidebarHeight(top, inset);
   return (
     <UiStateProvider>
-      <TopNav hideToc={ hide_toc } />
+      <TopNav hideToc={hide_toc} />
       <Navigation
-        tocRef={toc}
+        sidebarRef={toc}
         hide_toc={hide_toc}
         footer={<MadeWithMyst />}
         projectSlug={projectSlug}
@@ -105,7 +105,6 @@ export function ArticlePageAndNavigation({
     </UiStateProvider>
   );
 }
-
 
 export default function Page() {
   const { container } = useOutlineHeight();
