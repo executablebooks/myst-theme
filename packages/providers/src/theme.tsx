@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import type { NodeRenderer } from './types.js';
 import { Theme } from '@myst-theme/common';
 
@@ -56,15 +56,43 @@ type ThemeContextType = {
 const ThemeContext = React.createContext<ThemeContextType | undefined>(undefined);
 ThemeContext.displayName = 'ThemeContext';
 
-const prefersLightMQ = '(prefers-color-scheme: light)';
+const PREFERS_LIGHT_MQ = '(prefers-color-scheme: light)';
+
+/**
+ * Return the theme preference indicated by the system
+ */
+function getPreferredTheme() {
+  return window.matchMedia(PREFERS_LIGHT_MQ).matches ? Theme.light : Theme.dark;
+}
+
+const CLIENT_THEME_SOURCE = `
+  const theme = window.matchMedia(${JSON.stringify(PREFERS_LIGHT_MQ)}).matches ? 'light' : 'dark';
+  const classes = document.documentElement.classList;
+  const hasAnyTheme = classes.contains('light') || classes.contains('dark');
+  if (hasAnyTheme) {
+    console.warn("Document already has theme at load. Set by cookie perhaps?");
+  } else {
+    classes.add(theme);
+  }
+`;
+
+/**
+ * A blocking element that runs before hydration to update the <html> preferred class
+ */
+export function BlockingThemeLoader() {
+  return <script dangerouslySetInnerHTML={{ __html: CLIENT_THEME_SOURCE }} />;
+}
+
+const THEME_KEY = 'myst:theme';
 
 export function ThemeProvider({
   children,
-  theme: startingTheme = Theme.light,
+  theme: startingTheme,
   renderers,
   Link,
   top,
   NavLink,
+  staticBuild,
 }: {
   children: React.ReactNode;
   theme?: Theme;
@@ -72,32 +100,63 @@ export function ThemeProvider({
   Link?: Link;
   top?: number;
   NavLink?: NavLink;
+  staticBuild?: boolean;
 }) {
   const [theme, setTheme] = React.useState<Theme | null>(() => {
+    // Allow hard-coded theme ignoring system preferences (not recommended)
     if (startingTheme) {
-      if (isTheme(startingTheme)) return startingTheme;
-      else return null;
+      return isTheme(startingTheme) ? startingTheme : null;
     }
-    if (typeof document === 'undefined') return null;
-    return window.matchMedia(prefersLightMQ).matches ? Theme.light : Theme.dark;
+    if (typeof window !== 'object') {
+      return null;
+    }
+
+    // Prefer local storage if set
+    if (staticBuild) {
+      const savedTheme = localStorage.get(THEME_KEY);
+      if (savedTheme) {
+        return savedTheme;
+      }
+    }
+
+    // Interrogate the sytstem for a preferred theme
+    return getPreferredTheme();
   });
 
-  const nextTheme = React.useCallback(
-    (next: Theme) => {
-      if (!next || next === theme || !isTheme(next)) return;
-      if (typeof document !== 'undefined') {
-        document.getElementsByTagName('html')[0].className = next;
-      }
+  // Listen for system-updates that change the preferred theme
+  useEffect(() => {
+    const mediaQuery = window.matchMedia(PREFERS_LIGHT_MQ);
+    const handleChange = () => {
+      setTheme(mediaQuery.matches ? Theme.light : Theme.dark);
+    };
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+
+  // Listen for changes to theme, and propagate to server
+  // This should be unidirectional; updates to the cookie do not trigger document rerenders
+  const mountRun = useRef(false);
+  useEffect(() => {
+    // Only update after the component is mounted (i.e. don't send initial state)
+    if (!mountRun.current) {
+      mountRun.current = true;
+      return;
+    }
+    if (!isTheme(theme)) {
+      return;
+    }
+    if (staticBuild) {
+      localStorage.setItem(THEME_KEY, JSON.stringify(theme));
+    } else {
       const xmlhttp = new XMLHttpRequest();
       xmlhttp.open('POST', '/api/theme');
       xmlhttp.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
-      xmlhttp.send(JSON.stringify({ theme: next }));
-      setTheme(next);
-    },
-    [theme],
-  );
+      xmlhttp.send(JSON.stringify({ theme }));
+    }
+  }, [theme]);
+
   return (
-    <ThemeContext.Provider value={{ theme, setTheme: nextTheme, renderers, Link, NavLink, top }}>
+    <ThemeContext.Provider value={{ theme, setTheme, renderers, Link, NavLink, top }}>
       {children}
     </ThemeContext.Provider>
   );
