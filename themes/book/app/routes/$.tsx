@@ -71,7 +71,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   return json({ config, page, project });
 };
 
-export function ArticlePageAndNavigation({
+function ArticlePageAndNavigationInternal({
   children,
   hide_toc,
   projectSlug,
@@ -85,7 +85,7 @@ export function ArticlePageAndNavigation({
   const top = useThemeTop();
   const { container, toc } = useTocHeight(top, inset);
   return (
-    <UiStateProvider>
+    <>
       <TopNav hideToc={ hide_toc } />
       <Navigation
         tocRef={toc}
@@ -102,10 +102,32 @@ export function ArticlePageAndNavigation({
           {children}
         </article>
       </TabStateProvider>
-    </UiStateProvider>
+    </>
   );
 }
 
+export function ArticlePageAndNavigation({
+  children,
+  hide_toc,
+  projectSlug,
+  inset = 20, // begin text 20px from the top (aligned with menu)
+}: {
+  hide_toc?: boolean;
+  projectSlug?: string;
+  children: React.ReactNode;
+  inset?: number;
+}) {
+  return (
+    <UiStateProvider>
+      <ArticlePageAndNavigationInternal
+        children={children}
+        hide_toc={hide_toc}
+        projectSlug={projectSlug}
+        inset={inset}
+      />
+    </UiStateProvider>
+  );
+}
 
 export default function Page() {
   const { container } = useOutlineHeight();
